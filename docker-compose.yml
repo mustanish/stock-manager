@@ -1,0 +1,39 @@
+version: '2.4'
+services:
+  hisab-kitab-app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      target: dev
+    image: hisab-kitab:dev
+    container_name: hisab-kitab-app
+    restart: unless-stopped
+    volumes:
+      - ./:/usr/src/app/
+      - dependencies:/usr/src/app/node_modules
+    depends_on:
+      - hisab-kitab-db
+    environment:
+      DATABASE_NAME: 'hisabkitab'
+      DATABASE_USER: 'root'
+      DATABASE_PASS: 'hisabkitab'
+      DATABASE_URL: 'http://hisab-kitab-db:8529'
+      NODE_ENV: development
+    ports:
+      - '3000:3000'
+      - '9229:9229'
+  hisab-kitab-db:
+    image: arangodb:3.6.2
+    container_name: hisab-kitab-db
+    restart: unless-stopped
+    environment:
+      ARANGO_ROOT_PASSWORD: hisabkitab
+    volumes:
+      - arangodb_data:/var/lib/arangodb3
+      - arangodb_apps:/var/lib/arangodb3-apps
+    ports:
+      - '8529:8529'
+volumes:
+  arangodb_data:
+  arangodb_apps:
+  dependencies:
